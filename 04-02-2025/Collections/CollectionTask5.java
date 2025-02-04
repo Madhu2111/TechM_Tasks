@@ -1,26 +1,36 @@
 package com.collection.examples;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class CollectionTask5 {
+    public static void main(String[] args) {
+        int[] array = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        System.out.println("Original array:");
+        printArray(array);
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the index of the element to update:");
+        int index = scanner.nextInt();
+        System.out.println("Enter the new value:");
+        int newValue = scanner.nextInt();
+        updateArrayElement(array, index, newValue);
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		Scanner sc=new Scanner(System.in);
-		System.out.println("Enter a number:");
-		int n=sc.nextInt();
-		ArrayList<Integer> list=new ArrayList<>();
-		list.add(1);
-		list.add(2);
-		list.add(3);
-		list.add(4);
-		
-		
-		
-		
-		sc.close();
+        System.out.println("Updated array:");
+        printArray(array);
 
-	}
+    }
 
+    public static void updateArrayElement(int[] array, int index, int newValue) {
+        if (index >= 0 && index < array.length) {
+            array[index] = newValue;
+        } else {
+            System.out.println("Invalid index. Index should be between 0 and " + (array.length - 1));
+        }
+    }
+
+    public static void printArray(int[] array) {
+        for (int element : array) {
+            System.out.print(element + " ");
+        }
+        System.out.println();
+    }
 }
