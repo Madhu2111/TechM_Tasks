@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+    <bean id="laptop" class="com.example.ProductImplementation">
+        <property name="name" value="Laptop"/>
+        <property name="price" value="75000.0"/>
+        <property name="quantity" value="100"/>
+    </bean>
+
+    <bean id="mobile" class="com.example.ProductImplementation">
+        <property name="name" value="Smartphone"/>
+        <property name="price" value="500.0"/>
+        <property name="quantity" value="60"/>
+    </bean>
+
+    <bean id="earbuds" class="com.example.ProductImplementation">
+        <property name="name" value="Headphones"/>
+        <property name="price" value="1000.0"/>
+        <property name="quantity" value="90"/>
+    </bean>
+    <bean id="tablet" class="com.example.ProductImplementation">
+        <property name="name" value="Tab"/>
+        <property name="price" value="10000.0"/>
+        <property name="quantity" value="40"/>
+    </bean>
+
+    <bean id="cart" class="com.example.Cart">
+        <property name="products">
+            <list>
+                <ref bean="laptop"/>
+                <ref bean="mobile"/>
+                <ref bean="earbuds"/>
+                <ref bean="tablet"/>
+            </list>
+        </property>
+    </bean>
+
+</beans>
