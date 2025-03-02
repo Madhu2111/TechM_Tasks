@@ -1,0 +1,54 @@
+<div class="container">
+    <div class="registration-card">
+      <h2 class="title">Student Registration</h2>
+      
+      <form [formGroup]="registrationForm" (ngSubmit)="registerStudent()">
+        
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" formControlName="name" class="form-control">
+          <div class="error" *ngIf="registrationForm.get('name')?.invalid && registrationForm.get('name')?.touched">
+            <small *ngIf="registrationForm.get('name')?.hasError('required')">Name is required.</small>
+            <small *ngIf="registrationForm.get('name')?.hasError('minlength')">Name must be at least 3 characters.</small>
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" formControlName="email" class="form-control">
+          <div class="error" *ngIf="registrationForm.get('email')?.invalid && registrationForm.get('email')?.touched">
+            <small *ngIf="registrationForm.get('email')?.hasError('required')">Email is required.</small>
+            <small *ngIf="registrationForm.get('email')?.hasError('email')">Enter a valid email.</small>
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="age">Age</label>
+          <input type="number" id="age" formControlName="age" class="form-control">
+          <div class="error" *ngIf="registrationForm.get('age')?.invalid && registrationForm.get('age')?.touched">
+            <small *ngIf="registrationForm.get('age')?.hasError('required')">Age is required.</small>
+            <small *ngIf="registrationForm.get('age')?.hasError('min')">Minimum age is 18.</small>
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" formControlName="password" class="form-control">
+          <div class="error" *ngIf="registrationForm.get('password')?.invalid && registrationForm.get('password')?.touched">
+            <small *ngIf="registrationForm.get('password')?.hasError('required')">Password is required.</small>
+            <small *ngIf="registrationForm.get('password')?.hasError('minlength')">Password must be at least 6 characters.</small>
+            <small *ngIf="registrationForm.get('password')?.hasError('requiresNumber')">Password must contain at least one number.</small>
+          </div>
+        </div>
+  
+        <button type="submit" class="btn btn-primary btn-block" [disabled]="registrationForm.invalid">Register</button>
+      
+      </form>
+  
+      <div *ngIf="submitted" class="success-message">
+        <h3>Thank You, {{ formData.name }}! 🎉</h3>
+        <p>Your registration is successful.</p>
+      </div>
+    </div>
+  </div>
+  
