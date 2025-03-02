@@ -1,0 +1,17 @@
+---
+spring:
+ application:
+  name: spring-props
+
+server:
+ port: 8181
+
+my:
+ info:
+  product:
+   id: 999
+   code: "xyz"
+   model-version: 44.44
+   release_enable: false
+   start-key: 'N'
+...
