@@ -1,0 +1,234 @@
+<div class="container-fluid py-4">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h2 class="mb-0">
+        {{ showId ? 'Show Promotions' : 'All Promotions' }}
+      </h2>
+      <p class="text-muted">
+        {{ showId ? 'Manage discount codes and special offers for this show' : 'Manage all your promotional campaigns across shows' }}
+      </p>
+    </div>
+    <div class="col-md-4 d-flex justify-content-md-end align-items-center">
+      <button class="btn btn-primary" (click)="openCreateModal()">
+        <i class="bi bi-plus-circle me-1"></i> Create Promotion
+      </button>
+    </div>
+  </div>
+
+  <!-- Success and Error Messages -->
+  <div class="row mb-4" *ngIf="successMessage || error">
+    <div class="col-12">
+      <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ successMessage }}
+        <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+      </div>
+      <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ error }}
+        <button type="button" class="btn-close" (click)="error = ''"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="row mb-4">
+    <div class="col-md-6 mb-3 mb-md-0">
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control" placeholder="Search promotions..." [(ngModel)]="searchQuery">
+      </div>
+    </div>
+    <div class="col-md-6">
+      <select class="form-select" [(ngModel)]="statusFilter">
+        <option value="all">All Statuses</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+        <option value="expired">Expired</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading promotions...</p>
+  </div>
+
+  <!-- No Promotions Message -->
+  <div *ngIf="!isLoading && filteredPromotions.length === 0" class="text-center py-5">
+    <i class="bi bi-tag" style="font-size: 3rem;"></i>
+    <h4 class="mt-3">No Promotions Found</h4>
+    <p class="text-muted" *ngIf="statusFilter !== 'all' && promotions.length > 0">No promotions with this status. Try showing all statuses.</p>
+    <p class="text-muted" *ngIf="searchQuery && promotions.length > 0">No promotions match your search. Try a different query.</p>
+    <p class="text-muted" *ngIf="promotions.length === 0">You haven't created any promotions yet.</p>
+    <button class="btn btn-primary mt-2" (click)="openCreateModal()">Create Your First Promotion</button>
+  </div>
+
+  <!-- Promotions Table -->
+  <div *ngIf="!isLoading && filteredPromotions.length > 0" class="card shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Code</th>
+            <th>Discount</th>
+            <th>Validity</th>
+            <th>Usage</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let promotion of filteredPromotions">
+            <td>
+              <div class="fw-bold">{{ promotion.name }}</div>
+              <small class="text-muted" *ngIf="promotion.description">{{ promotion.description }}</small>
+            </td>
+            <td>
+              <span class="badge bg-light text-dark promo-code">{{ promotion.code }}</span>
+            </td>
+            <td>{{ getDiscountDisplay(promotion) }}</td>
+            <td>
+              <div>{{ getFormattedDate(promotion.startDate) }}</div>
+              <div>to {{ getFormattedDate(promotion.endDate) }}</div>
+            </td>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                  <div class="progress-bar" [ngClass]="getUsageClass(promotion)" 
+                       [style.width.%]="getUsagePercentage(promotion)"></div>
+                </div>
+                <span>{{ promotion.currentUses }}/{{ promotion.maxUses }}</span>
+              </div>
+            </td>
+            <td>
+              <span [ngClass]="getStatusClass(promotion.status)">
+                {{ promotion.status | titlecase }}
+              </span>
+            </td>
+            <td>
+              <div class="btn-group">
+                <button class="btn btn-sm btn-outline-primary" (click)="openEditModal(promotion)">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" (click)="deletePromotion(promotion.id!)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Promotion Modal -->
+  <div class="modal fade" [class.show]="showPromotionModal" [style.display]="showPromotionModal ? 'block' : 'none'" tabindex="-1" aria-labelledby="promotionModalLabel" [attr.aria-hidden]="!showPromotionModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="promotionModalLabel">{{ isEditing ? 'Edit Promotion' : 'Create Promotion' }}</h5>
+          <button type="button" class="btn-close" (click)="closePromotionModal()"></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="promotionForm">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="name" class="form-label">Promotion Name*</label>
+                <input type="text" class="form-control" id="name" formControlName="name" placeholder="Summer Sale">
+                <div *ngIf="promotionForm.get('name')?.invalid && promotionForm.get('name')?.touched" class="text-danger">
+                  Promotion name is required
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="code" class="form-label">Promo Code*</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="code" formControlName="code" placeholder="SUMMER20">
+                  <button class="btn btn-outline-secondary" type="button" (click)="regenerateCode()">
+                    <i class="bi bi-arrow-repeat"></i>
+                  </button>
+                </div>
+                <div *ngIf="promotionForm.get('code')?.invalid && promotionForm.get('code')?.touched" class="text-danger">
+                  <div *ngIf="promotionForm.get('code')?.errors?.['required']">Promo code is required</div>
+                  <div *ngIf="promotionForm.get('code')?.errors?.['pattern']">Code must be 4-10 uppercase letters or numbers</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="discountType" class="form-label">Discount Type*</label>
+                <select class="form-select" id="discountType" formControlName="discountType">
+                  <option value="percentage">Percentage (%)</option>
+                  <option value="fixed">Fixed Amount ($)</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="discountValue" class="form-label">Discount Value*</label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="discountValue" formControlName="discountValue" min="1" [max]="promotionForm.get('discountType')?.value === 'percentage' ? 100 : 1000">
+                  <span class="input-group-text">{{ promotionForm.get('discountType')?.value === 'percentage' ? '%' : '$' }}</span>
+                </div>
+                <div *ngIf="promotionForm.get('discountValue')?.invalid && promotionForm.get('discountValue')?.touched" class="text-danger">
+                  <div *ngIf="promotionForm.get('discountValue')?.errors?.['required']">Discount value is required</div>
+                  <div *ngIf="promotionForm.get('discountValue')?.errors?.['min']">Value must be at least 1</div>
+                  <div *ngIf="promotionForm.get('discountValue')?.errors?.['max']">Value must be at most {{ promotionForm.get('discountType')?.value === 'percentage' ? '100%' : '$1000' }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="startDate" class="form-label">Start Date*</label>
+                <input type="date" class="form-control" id="startDate" formControlName="startDate">
+                <div *ngIf="promotionForm.get('startDate')?.invalid && promotionForm.get('startDate')?.touched" class="text-danger">
+                  Start date is required
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="endDate" class="form-label">End Date*</label>
+                <input type="date" class="form-control" id="endDate" formControlName="endDate">
+                <div *ngIf="promotionForm.get('endDate')?.invalid && promotionForm.get('endDate')?.touched" class="text-danger">
+                  <div *ngIf="promotionForm.get('endDate')?.errors?.['required']">End date is required</div>
+                  <div *ngIf="promotionForm.get('endDate')?.errors?.['dateRange']">End date must be after start date</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="maxUses" class="form-label">Maximum Uses*</label>
+                <input type="number" class="form-control" id="maxUses" formControlName="maxUses" min="1">
+                <div *ngIf="promotionForm.get('maxUses')?.invalid && promotionForm.get('maxUses')?.touched" class="text-danger">
+                  <div *ngIf="promotionForm.get('maxUses')?.errors?.['required']">Maximum uses is required</div>
+                  <div *ngIf="promotionForm.get('maxUses')?.errors?.['min']">Value must be at least 1</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="status" class="form-label">Status*</label>
+                <select class="form-select" id="status" formControlName="status">
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="description" class="form-label">Description (Optional)</label>
+              <textarea class="form-control" id="description" formControlName="description" rows="3" placeholder="Additional details about this promotion..."></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closePromotionModal()">Cancel</button>
+          <button type="button" class="btn btn-primary" [disabled]="promotionForm.invalid" (click)="savePromotion()">
+            {{ isEditing ? 'Update Promotion' : 'Create Promotion' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade" [class.show]="showPromotionModal" *ngIf="showPromotionModal"></div>
+</div>

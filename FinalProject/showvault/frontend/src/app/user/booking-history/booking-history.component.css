@@ -1,0 +1,39 @@
+.card-header {
+  background-color: #dc3545 !important; /* Using the red theme color */
+}
+
+.btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.badge {
+  font-size: 0.85rem;
+  padding: 0.35em 0.65em;
+}
+
+.btn-group .btn {
+  padding: 0.25rem 0.5rem;
+}
+
+.btn-group .btn i {
+  font-size: 1rem;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+}
+
+/* Animation for alerts */
+.alert {
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

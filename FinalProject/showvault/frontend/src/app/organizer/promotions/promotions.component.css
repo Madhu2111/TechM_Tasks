@@ -1,0 +1,80 @@
+.card {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+.table th {
+  font-weight: 600;
+  color: #495057;
+  border-top: none;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.promo-code {
+  font-family: monospace;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  padding: 0.5em 0.75em;
+}
+
+.progress {
+  border-radius: 10px;
+  background-color: #e9ecef;
+}
+
+.progress-bar {
+  border-radius: 10px;
+}
+
+.badge {
+  padding: 0.5em 0.75em;
+  font-weight: 500;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #495057;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.input-group-text {
+  background-color: #f8f9fa;
+}
+
+/* Modal Styles */
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal.show {
+  display: block;
+}
+
+.modal-backdrop.show {
+  opacity: 0;
+}
+
+.modal-content {
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  border-bottom: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+}
+
+.modal-footer {
+  border-top: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+}

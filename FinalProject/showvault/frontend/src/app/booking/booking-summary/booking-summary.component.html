@@ -1,0 +1,93 @@
+<div class="card booking-summary-card" *ngIf="summary">
+  <div class="card-header">
+    <h5 class="mb-0">Booking Summary</h5>
+  </div>
+  <div class="card-body">
+    <!-- Show Details -->
+    <div class="show-details mb-4">
+      <div class="d-flex">
+        <div class="show-image me-3">
+          <img [src]="summary.show.image || 'assets/images/default-show.jpg'" [alt]="summary.show.title" class="img-fluid rounded">
+        </div>
+        <div>
+          <h5 class="show-title">{{ summary.show.title }}</h5>
+          <div class="show-type mb-2">
+            <span class="badge" 
+                  [ngClass]="{
+                    'bg-success': summary.show.type === 'Movie',
+                    'bg-info': summary.show.type === 'Theater',
+                    'bg-danger': summary.show.type === 'Concert',
+                    'bg-secondary': summary.show.type !== 'Movie' && summary.show.type !== 'Theater' && summary.show.type !== 'Concert'
+                  }">
+              {{ summary.show.type }}
+            </span>
+          </div>
+          <div class="show-schedule">
+            <div><i class="bi bi-calendar3 me-2"></i>{{ formatDate(summary.schedule.date) }}</div>
+            <div><i class="bi bi-clock me-2"></i>{{ formatTime(summary.schedule.time) }}</div>
+            <div><i class="bi bi-geo-alt me-2"></i>{{ summary.schedule.venue }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Seats Details -->
+    <div class="seats-details mb-4">
+      <h6 class="section-title">Selected Seats ({{ summary.seats.count }})</h6>
+      <div class="seats-list">
+        <div class="row">
+          <div class="col-6" *ngFor="let seat of summary.seats.details">
+            <div class="seat-item">
+              <span class="seat-label">{{ seat.row }}{{ seat.seatNumber }}</span>
+              <span class="seat-category" *ngIf="seat.category">
+                {{ seat.category }}
+              </span>
+              <span class="seat-price">${{ seat.price.toFixed(2) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="text-end mt-2" *ngIf="showEditButton">
+        <button class="btn btn-sm btn-outline-primary" (click)="onEditSeats()">
+          <i class="bi bi-pencil me-1"></i>Edit Seats
+        </button>
+      </div>
+    </div>
+    
+    <!-- Price Details -->
+    <div class="price-details">
+      <h6 class="section-title">Price Details</h6>
+      <div class="price-item d-flex justify-content-between">
+        <span>Subtotal</span>
+        <span>${{ summary.pricing.subtotal.toFixed(2) }}</span>
+      </div>
+      <div class="price-item d-flex justify-content-between">
+        <span>Booking Fee</span>
+        <span>${{ summary.pricing.fees.toFixed(2) }}</span>
+      </div>
+      <div class="price-item d-flex justify-content-between">
+        <span>Tax</span>
+        <span>${{ summary.pricing.taxes.toFixed(2) }}</span>
+      </div>
+      <div class="price-total d-flex justify-content-between">
+        <span>Total</span>
+        <span>${{ summary.pricing.total.toFixed(2) }}</span>
+      </div>
+    </div>
+    
+    <!-- Customer Details -->
+    <div class="customer-details mt-4" *ngIf="summary.customer">
+      <h6 class="section-title">Customer Details</h6>
+      <div><strong>Name:</strong> {{ summary.customer.name }}</div>
+      <div><strong>Email:</strong> {{ summary.customer.email }}</div>
+    </div>
+    
+    <!-- Payment Button -->
+    <div class="mt-4" *ngIf="showPaymentButton">
+      <button class="btn btn-primary w-100" [disabled]="isProcessing" (click)="onProceedToPayment()">
+        <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        Proceed to Payment
+      </button>
+    </div>
+  </div>
+</div>

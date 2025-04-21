@@ -1,0 +1,279 @@
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-md-12 mb-4">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">Admin Dashboard</h3>
+        </div>
+        <div class="card-body">
+          <!-- Error message -->
+          <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ error }}
+            <button type="button" class="btn-close" (click)="error = ''"></button>
+          </div>
+          
+          <!-- Loading spinner -->
+          <div *ngIf="isLoading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading dashboard data...</p>
+          </div>
+          
+          <!-- Dashboard tabs -->
+          <ul class="nav nav-tabs" *ngIf="!isLoading">
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')" href="javascript:void(0)">Overview</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="activeTab === 'users'" (click)="setActiveTab('users')" href="javascript:void(0)">User Analytics</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="activeTab === 'sales'" (click)="setActiveTab('sales')" href="javascript:void(0)">Sales Reports</a>
+            </li>
+          </ul>
+          
+          <!-- Overview Tab -->
+          <div class="tab-content mt-3" *ngIf="!isLoading && activeTab === 'overview' && dashboardStats">
+            <div class="row">
+              <!-- Total Users Card -->
+              <div class="col-md-4 mb-4">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h5 class="card-title">Total Users</h5>
+                    <div class="display-4 fw-bold text-primary">{{ dashboardStats.totalUsers }}</div>
+                    <div class="text-muted small mt-2">{{ dashboardStats.newUsers }} new this month</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Total Shows Card -->
+              <div class="col-md-4 mb-4">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h5 class="card-title">Active Shows</h5>
+                    <div class="display-4 fw-bold text-primary">{{ dashboardStats.activeShows }}</div>
+                    <div class="text-muted small mt-2">{{ dashboardStats.upcomingShows }} upcoming</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Total Revenue Card -->
+              <div class="col-md-4 mb-4">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h5 class="card-title">Total Revenue</h5>
+                    <div class="display-4 fw-bold text-primary">${{ dashboardStats.totalRevenue | number:'1.2-2' }}</div>
+                    <div class="text-muted small mt-2">{{ dashboardStats.bookingsThisMonth }} bookings this month</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="card mt-4">
+              <div class="card-header">
+                <h5 class="mb-0">Recent Activity</h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>User</th>
+                        <th>Activity</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let activity of dashboardStats.recentActivity">
+                        <td>{{ formatDate(activity.timestamp) }}</td>
+                        <td>{{ activity.user }}</td>
+                        <td>{{ activity.action }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- User Analytics Tab -->
+          <div class="tab-content mt-3" *ngIf="!isLoading && activeTab === 'users' && userReport">
+            <div class="row">
+              <!-- User Types Chart -->
+              <div class="col-md-6 mb-4">
+                <div class="card">
+                  <div class="card-header">
+                    <h5 class="mb-0">User Distribution</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="chart-container">
+                      <!-- In a real app, this would be a chart component -->
+                      <div class="mock-chart">
+                        <div class="chart-segment" style="width: 60%; background-color: #0d6efd;">
+                          Regular Users: {{ userReport.userTypes.regular }}
+                        </div>
+                        <div class="chart-segment" style="width: 30%; background-color: #20c997;">
+                          Organizers: {{ userReport.userTypes.organizer }}
+                        </div>
+                        <div class="chart-segment" style="width: 10%; background-color: #dc3545;">
+                          Admins: {{ userReport.userTypes.admin }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- User Growth Chart -->
+              <div class="col-md-6 mb-4">
+                <div class="card">
+                  <div class="card-header">
+                    <h5 class="mb-0">User Growth</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="chart-container">
+                      <!-- In a real app, this would be a line chart component -->
+                      <div class="mock-line-chart">
+                        <div *ngFor="let month of userReport.growthByMonth" class="line-chart-bar" 
+                             [style.height.%]="month.count / userReport.maxMonthlyUsers * 100">
+                          <div class="line-chart-tooltip">
+                            {{ month.month }}: {{ month.count }} users
+                          </div>
+                        </div>
+                      </div>
+                      <div class="line-chart-labels">
+                        <span *ngFor="let month of userReport.growthByMonth">{{ month.month }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Active Users Table -->
+            <div class="card mt-4">
+              <div class="card-header">
+                <h5 class="mb-0">Most Active Users</h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Bookings</th>
+                        <th>Last Active</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let user of userReport.mostActiveUsers">
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.id ? user.email : 'N/A' }}</td>
+                        <td>{{ user.role }}</td>
+                        <td>{{ user.bookings }}</td>
+                        <td>{{ formatDate(user.lastActive.toString()) }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Sales Reports Tab -->
+          <div class="tab-content mt-3" *ngIf="!isLoading && activeTab === 'sales' && salesReport">
+            <div class="row">
+              <!-- Revenue Summary -->
+              <div class="col-md-4 mb-4">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h5 class="card-title">Total Revenue</h5>
+                    <div class="display-4 fw-bold text-primary">${{ salesReport.totalRevenue | number:'1.2-2' }}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Tickets Sold -->
+              <div class="col-md-4 mb-4">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h5 class="card-title">Tickets Sold</h5>
+                    <div class="display-4 fw-bold text-primary">{{ salesReport.ticketsSold | number }}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Average Ticket Price -->
+              <div class="col-md-4 mb-4">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h5 class="card-title">Avg. Ticket Price</h5>
+                    <div class="display-4 fw-bold text-primary">${{ salesReport.averageTicketPrice | number:'1.2-2' }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Monthly Revenue Chart -->
+            <div class="card mt-4">
+              <div class="card-header">
+                <h5 class="mb-0">Monthly Revenue</h5>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <!-- In a real app, this would be a bar chart component -->
+                  <div class="mock-bar-chart">
+                    <div *ngFor="let item of salesReport.revenueByMonth" class="bar-chart-bar" 
+                         [style.height.%]="item.amount / salesReport.maxMonthlyRevenue * 100">
+                      <div class="bar-chart-tooltip">
+                        {{ item.month }}: ${{ item.amount | number:'1.2-2' }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bar-chart-labels">
+                    <span *ngFor="let item of salesReport.revenueByMonth">{{ item.month }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Top Selling Shows -->
+            <div class="card mt-4">
+              <div class="card-header">
+                <h5 class="mb-0">Top Selling Shows</h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Show Name</th>
+                        <th>Organizer</th>
+                        <th>Tickets Sold</th>
+                        <th>Revenue</th>
+                        <th>Avg. Price</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let show of salesReport.topSellingShows">
+                        <td>{{ show.name }}</td>
+                        <td>{{ show.organizer }}</td>
+                        <td>{{ show.ticketsSold }}</td>
+                        <td>${{ show.revenue | number:'1.2-2' }}</td>
+                        <td>${{ show.averagePrice | number:'1.2-2' }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

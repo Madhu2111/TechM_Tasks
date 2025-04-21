@@ -1,0 +1,232 @@
+<div class="container py-4 fade-in">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a routerLink="/" class="text-primary">Home</a></li>
+      <li class="breadcrumb-item"><a routerLink="/shows" class="text-primary">Shows</a></li>
+      <li class="breadcrumb-item" *ngIf="show"><a [routerLink]="['/shows', show.id]" class="text-primary">{{ show.title }}</a></li>
+      <li class="breadcrumb-item active">Book Tickets</li>
+    </ol>
+  </nav>
+
+  <!-- Page Title -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">Book Tickets</h1>
+    <button class="btn btn-outline-secondary" (click)="goBack()">
+      <i class="bi bi-arrow-left me-2"></i>Back
+    </button>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="flex-center my-5 slide-up">
+    <div class="text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-secondary">Loading theaters and showtimes...</p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="alert alert-danger fade-in" role="alert">
+    <div class="flex-between">
+      <div class="flex-center">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {{ error }}
+      </div>
+      <button class="btn btn-outline-danger" (click)="goBack()">
+        <i class="bi bi-arrow-left me-1"></i>Go Back
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="row" *ngIf="!loading && !error && show">
+    <!-- Show Info -->
+    <div class="col-lg-4 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex mb-3">
+            <div class="flex-shrink-0">
+              <img [src]="show.poster_url || show.posterUrl || show.image_url || show.imageUrl || show.image || 'assets/images/placeholder-movie.jpg'" 
+                   [alt]="show.title" 
+                   class="show-poster"
+                   style="width: 120px; height: 180px; object-fit: cover;"
+                   onerror="this.src='assets/images/placeholder-movie.jpg'; this.onerror=null;">
+            </div>
+            <div class="ms-3">
+              <h4 class="card-title mb-2">{{ show.title }}</h4>
+              <span class="badge mb-2" 
+                    [ngClass]="{
+                      'bg-success': show.type === 'Movie',
+                      'bg-info': show.type === 'Theater',
+                      'bg-danger': show.type === 'Concert',
+                      'bg-secondary': show.type !== 'Movie' && show.type !== 'Theater' && show.type !== 'Concert'
+                    }">
+                {{ show.type }}
+              </span>
+              <div class="mt-2 text-muted">
+                <div *ngIf="show.duration" class="mb-1">
+                  <i class="bi bi-stopwatch me-2"></i>{{ show.duration }} minutes
+                </div>
+                <div *ngIf="show.genre" class="mb-1">
+                  <i class="bi bi-tags me-2"></i>{{ show.genre }}
+                </div>
+                <div *ngIf="show.language" class="mb-1">
+                  <i class="bi bi-translate me-2"></i>{{ show.language }}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="show-description mt-3">
+            <h6 class="mb-2">About the Show</h6>
+            <p class="text-muted small">{{ show.description || 'No description available for this show.' }}</p>
+          </div>
+        </div>
+      </div>
+
+    <!-- Date Selection -->
+    <div class="col-lg-8">
+      <div class="card mb-4 card-hover">
+        <div class="card-header bg-light flex-between">
+          <h5 class="mb-0"><i class="bi bi-calendar3 me-2"></i>Select Date</h5>
+          <span class="badge bg-primary">{{ availableDates.length }} dates available</span>
+        </div>
+        <div class="card-body">
+          <div class="date-list">
+            <div *ngFor="let date of availableDates" 
+                 class="date-item" 
+                 [class.active]="selectedDate === date"
+                 (click)="selectDate(date)">
+              <div class="date-day">{{ formatShortDate(date) }}</div>
+              <div class="date-full small">{{ formatDate(date) }}</div>
+              <div class="mt-2" *ngIf="selectedDate === date">
+                <i class="bi bi-check-circle-fill text-white"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Theaters Selection -->
+      <div class="card mb-4">
+        <div class="card-header bg-light">
+          <h5 class="mb-0"><i class="bi bi-building me-2"></i>Select Theater</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="!venues.length" class="text-center py-3 text-muted">
+            <p>No theaters available for this show</p>
+          </div>
+          
+          <!-- Theater List -->
+          <div class="theater-list">
+            <div *ngFor="let venue of venues" 
+                 class="theater-block mb-4" 
+                 [class.active]="selectedVenue?.id === venue.id"
+                 (click)="selectVenue(venue)">
+              <div class="theater-header d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                <div>
+                  <h5 class="mb-0">{{ venue.name }}</h5>
+                  <div class="small text-muted">{{ venue.address }}, {{ venue.city }}</div>
+                </div>
+                <div class="theater-amenities">
+                  <span class="badge bg-light text-dark me-1">Food & Beverages</span>
+                  <span class="badge bg-light text-dark">Wheelchair Accessible</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Date and Schedule Selection (only shown when venue is selected) -->
+          <div *ngIf="selectedVenue" class="mt-4">
+            <h6 class="mb-3">Select Date & Time for {{ selectedVenue.name }}</h6>
+            
+            <!-- Date Selection -->
+            <div class="date-list mb-4">
+              <div *ngFor="let date of availableDates" 
+                   class="date-item" 
+                   [class.active]="selectedDate === date"
+                   (click)="selectDate(date)">
+                <div class="date-day">{{ formatShortDate(date) }}</div>
+                <div class="date-full small">{{ formatDate(date) }}</div>
+              </div>
+            </div>
+
+            <!-- Showtimes for Selected Date -->
+            <div *ngIf="selectedDate" class="showtime-list">
+              <ng-container *ngFor="let schedule of getSchedulesForVenueAndDate(selectedVenue.id!, selectedDate)">
+                <div class="showtime-item" 
+                     [class.active]="selectedSchedule && selectedSchedule.id === schedule?.id"
+                     [class.sold-out]="getScheduleAvailableSeats(schedule) === 0"
+                     [class.disabled]="getScheduleAvailableSeats(schedule) === 0"
+                     (click)="getScheduleAvailableSeats(schedule) > 0 ? selectSchedule(schedule) : null">
+                  <div class="showtime-time">{{ schedule?.showTime }}</div>
+                  <div class="showtime-info small">
+                    <span class="badge" 
+                          [ngClass]="{
+                            'bg-success': getScheduleAvailableSeats(schedule) > 0,
+                            'bg-danger': getScheduleAvailableSeats(schedule) === 0
+                          }">
+                      {{ getScheduleAvailableSeats(schedule) === 0 ? 'Sold Out' : getScheduleAvailableSeats(schedule) + ' seats available' }}
+                    </span>
+                  </div>
+                </div>
+              </ng-container>
+
+              <div *ngIf="getSchedulesForVenueAndDate(selectedVenue.id!, selectedDate).length === 0" 
+                   class="text-center py-3 text-muted">
+                <p>No showtimes available for the selected date</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected Showtime & Proceed -->
+      <div class="card" *ngIf="selectedSchedule">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="bi bi-check-circle me-2"></i>Selected Showtime</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-8">
+              <div class="selected-details">
+                <h5 class="mb-2">{{ selectedSchedule.venue?.name }}</h5>
+                <div class="mb-2">
+                  <span class="badge bg-info me-2">{{ formatDate(selectedSchedule.showDate) }}</span>
+                  <span class="badge bg-success">{{ selectedSchedule.showTime }}</span>
+                </div>
+                <div class="small text-muted mb-3">
+                  <i class="bi bi-geo-alt me-1"></i>{{ selectedSchedule.venue?.address }}, {{ selectedSchedule.venue?.city }}
+                </div>
+                <div class="price-info">
+                  <span class="fw-bold">Price:</span> ${{ selectedSchedule.basePrice }} per ticket
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 d-flex align-items-center justify-content-end">
+              <button class="btn btn-primary w-100" 
+                      (click)="proceedToSeatSelection()">
+                <i class="bi bi-arrow-right me-2"></i>Select Seats
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- No Selection Message -->
+      <div class="card" *ngIf="!selectedSchedule">
+        <div class="card-body text-center py-4">
+          <i class="bi bi-calendar-event text-muted" style="font-size: 2rem;"></i>
+          <h5 class="mt-3">No Showtime Selected</h5>
+          <p class="text-muted">Please select a showtime from one of the theaters above to continue</p>
+          <div *ngIf="selectedDate && hasTheatersForSelectedDate()" class="alert alert-info mt-3">
+            <i class="bi bi-info-circle me-2"></i>
+            Click on an available showtime to select it and proceed to seat selection
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

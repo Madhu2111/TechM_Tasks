@@ -1,0 +1,170 @@
+<div class="container py-4 fade-in">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a routerLink="/" class="text-primary">Home</a></li>
+      <li class="breadcrumb-item"><a routerLink="/shows" class="text-primary">Shows</a></li>
+      <li class="breadcrumb-item" *ngIf="show"><a [routerLink]="['/shows', show.id]" class="text-primary">{{ show.title }}</a></li>
+      <li class="breadcrumb-item"><a [routerLink]="['/booking/theater-selection', show?.id]" class="text-primary">Book Tickets</a></li>
+      <li class="breadcrumb-item active">Select Seats</li>
+    </ol>
+  </nav>
+
+  <!-- Page Title -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">Select Your Seats</h1>
+    <button class="btn btn-outline-secondary" (click)="goBack()">
+      <i class="bi bi-arrow-left me-2"></i>Back to Theaters
+    </button>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="flex-center my-5 slide-up">
+    <div class="text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-secondary">Loading seat map...</p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="alert alert-danger fade-in" role="alert">
+    <div class="flex-between">
+      <div class="flex-center">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {{ error }}
+      </div>
+      <button class="btn btn-outline-danger" (click)="goBack()">
+        <i class="bi bi-arrow-left me-1"></i>Go Back
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="row" *ngIf="!loading && !error && seatMap">
+    <!-- Seat Selection Area -->
+    <div class="col-lg-8">
+      <div class="card seat-selection-card">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-grid-3x3 me-2"></i>Seat Map</h5>
+            <span class="badge bg-primary">{{ selectedSeats.length }} seats selected</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Show Info -->
+          <div class="show-info mb-4" *ngIf="show && schedule">
+            <h5 class="show-title">{{ show.title }}</h5>
+            <div class="show-details">
+              <span class="badge me-2" 
+                    [ngClass]="{
+                      'bg-success': show.type === 'Movie',
+                      'bg-info': show.type === 'Theater',
+                      'bg-danger': show.type === 'Concert',
+                      'bg-secondary': show.type !== 'Movie' && show.type !== 'Theater' && show.type !== 'Concert'
+                    }">
+                {{ show.type }}
+              </span>
+              <span class="text-muted">
+                <i class="bi bi-calendar3 me-1"></i>{{ schedule.showDate }} 
+                <i class="bi bi-clock ms-2 me-1"></i>{{ schedule.showTime }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Seat Map -->
+          <div class="seat-selection-container">
+            <!-- Screen -->
+            <div class="screen-container">
+              <div class="screen">{{ seatMap.screen || 'SCREEN' }}</div>
+            </div>
+
+            <!-- Seat Map -->
+            <div class="seat-map">
+              <div class="row-container" *ngFor="let row of seatMap.rows">
+                <div class="row-label">{{ row.rowLabel }}</div>
+                <div class="seats-row">
+                  <div *ngFor="let seat of row.seats"
+                       class="seat"
+                       [ngClass]="[getSeatStatusClass(seat), getSeatCategoryClass(seat)]"
+                       (click)="toggleSeatSelection(seat)"
+                       [attr.data-seat]="seat.seatNumber"
+                       [attr.data-status]="seat.status"
+                       [attr.data-category]="seat.category">
+                    {{ seat.seatNumber }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seat Legend -->
+            <div class="seat-legend">
+              <div class="legend-item">
+                <div class="seat-sample available"></div>
+                <span>{{ seatMap.legend?.available || 'Available' }}</span>
+              </div>
+              <div class="legend-item">
+                <div class="seat-sample selected"></div>
+                <span>{{ seatMap.legend?.selected || 'Selected' }}</span>
+              </div>
+              <div class="legend-item">
+                <div class="seat-sample reserved"></div>
+                <span>{{ seatMap.legend?.reserved || 'Reserved' }}</span>
+              </div>
+              <div class="legend-item">
+                <div class="seat-sample sold"></div>
+                <span>{{ seatMap.legend?.sold || 'Sold' }}</span>
+              </div>
+            </div>
+
+            <!-- Category Legend -->
+            <div class="category-legend" *ngIf="seatMap && seatMap.legend && (seatMap.legend.standard || seatMap.legend.premium || seatMap.legend.vip)">
+              <div class="legend-item" *ngIf="seatMap && seatMap.legend && seatMap.legend.standard">
+                <div class="category-sample standard"></div>
+                <span>{{ seatMap && seatMap.legend && seatMap.legend.standard || 'Standard' }} ($10.99)</span>
+              </div>
+              <div class="legend-item" *ngIf="seatMap && seatMap.legend && seatMap.legend.premium">
+                <div class="category-sample premium"></div>
+                <span>{{ seatMap && seatMap.legend && seatMap.legend.premium || 'Premium' }} ($14.99)</span>
+              </div>
+              <div class="legend-item" *ngIf="seatMap && seatMap.legend && seatMap.legend.vip">
+                <div class="category-sample vip"></div>
+                <span>{{ seatMap && seatMap.legend && seatMap.legend.vip || 'VIP' }} ($19.99)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Selected Seats Info -->
+          <div class="selected-seats-info mt-4" *ngIf="selectedSeats.length > 0">
+            <h6>Selected Seats:</h6>
+            <div class="selected-seats-list">
+              <span *ngFor="let seat of selectedSeats; let last = last" class="selected-seat-badge">
+                {{ getSeatRow(seat) }}{{ seat.seatNumber }}
+                <span *ngIf="!last" class="mx-1">,</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Summary -->
+    <div class="col-lg-4">
+      <app-booking-summary 
+        [summary]="bookingSummary" 
+        [showPaymentButton]="true"
+        [isProcessing]="processingBooking"
+        (proceedToPayment)="proceedToCheckout()">
+      </app-booking-summary>
+
+      <div class="card mt-4" *ngIf="!bookingSummary">
+        <div class="card-body text-center py-5">
+          <i class="bi bi-ticket-perforated fs-1 text-muted mb-3 d-block"></i>
+          <h5>No Seats Selected</h5>
+          <p class="text-muted">Please select seats from the seat map to continue.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

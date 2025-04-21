@@ -1,0 +1,187 @@
+<!-- Hero Section with Login/Register Buttons -->
+<div class="hero-section position-relative mb-5">
+  <div class="hero-overlay"></div>
+  <div class="container position-relative py-5">
+    <div class="row py-5">
+      <div class="col-lg-6 py-5">
+        <h1 class="display-4 text-white fw-bold mb-4">Book Your Entertainment Experience</h1>
+        <p class="lead text-white mb-4">Discover and book the best movies, shows, concerts, and events all in one place.</p>
+        <div class="d-flex flex-wrap gap-3" *ngIf="!isLoggedIn">
+          <a routerLink="/login" class="btn btn-danger btn-lg px-4 py-2">Login</a>
+          <a routerLink="/register" class="btn btn-outline-light btn-lg px-4 py-2">Register</a>
+        </div>
+        <div *ngIf="isLoggedIn" class="d-flex flex-wrap gap-3">
+          <a routerLink="/shows" class="btn btn-danger btn-lg px-4 py-2">Explore Shows</a>
+          <a routerLink="/booking/test" class="btn btn-outline-light btn-lg px-4 py-2">Test Booking Flow</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Category Navigation -->
+<div class="container mb-5">
+  <div class="row g-3">
+    <div class="col-md-3" *ngFor="let category of categories">
+      <div class="card h-100 text-center category-card shadow-sm" (click)="navigateToCategory(category.params.category)">
+        <div class="card-body py-4">
+          <i class="{{category.icon}} fs-1 text-primary mb-3"></i>
+          <h5 class="card-title mb-0">{{category.name}}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Featured Shows Carousel -->
+<div class="container-fluid px-0 mb-5">
+  <div id="showCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+      <button *ngFor="let show of featuredShows; let i = index" type="button" data-bs-target="#showCarousel" [attr.data-bs-slide-to]="i" [class.active]="i === 0" [attr.aria-current]="i === 0 ? 'true' : null"></button>
+    </div>
+    <div class="carousel-inner rounded shadow">
+      <div *ngFor="let show of featuredShows; let i = index" class="carousel-item" [class.active]="i === 0">
+        <img [src]="show.posterUrl || show.imageUrl || show.image" class="d-block w-100" alt="{{show.title}}">
+        <div class="carousel-caption d-none d-md-block">
+          <h2 class="display-6 fw-bold">{{show.title}}</h2>
+          <p class="lead">{{show.type}} | {{show.date | date:'mediumDate'}}</p>
+          <a [routerLink]="['/shows', show.id]" class="btn btn-danger btn-lg">Book Now</a>
+        </div>
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#showCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#showCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+</div>
+
+<!-- Featured Shows Section -->
+<div class="container mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="section-title">Featured Shows</h2>
+    <a routerLink="/shows" class="btn btn-outline-primary" (click)="checkLoginBeforeNavigate($event, '/shows')">View All</a>
+  </div>
+  <div class="row">
+    <div class="col-md-4 mb-4" *ngFor="let show of featuredShows.slice(0, 3)">
+      <div class="card h-100 shadow-sm hover-effect">
+        <div class="badge bg-danger position-absolute m-2">{{show.type}}</div>
+        <img [src]="show.image" class="card-img-top" alt="{{show.title}}">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title text-primary">{{show.title}}</h5>
+          <p class="card-text">
+            <small class="text-muted">
+              <i class="bi bi-calendar"></i> {{show.date | date:'mediumDate'}} | 
+              <i class="bi bi-geo-alt"></i> {{show.venue}}
+            </small>
+          </p>
+          <div class="mt-auto">
+            <p class="card-text mb-2"><span class="h5 text-danger">${{show.price}}</span></p>
+            <a [routerLink]="['/shows', show.id]" class="btn btn-primary w-100" (click)="checkLoginBeforeNavigate($event, '/shows/' + show.id)">
+              <i class="bi bi-ticket me-2"></i>Book Now
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upcoming Shows Section -->
+<div class="container mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="section-title">Upcoming Shows</h2>
+    <a routerLink="/shows" class="btn btn-outline-primary" (click)="checkLoginBeforeNavigate($event, '/shows')">View All</a>
+  </div>
+  <div class="row">
+    <div class="col-md-4 mb-4" *ngFor="let show of upcomingShows.slice(0, 3)">
+      <div class="card h-100 shadow-sm hover-effect">
+        <div class="badge bg-danger position-absolute m-2">{{show.type}}</div>
+        <img [src]="show.image" class="card-img-top" alt="{{show.title}}">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{show.title}}</h5>
+          <p class="card-text">
+            <small class="text-muted">
+              <i class="bi bi-calendar"></i> {{show.date | date:'mediumDate'}} | 
+              <i class="bi bi-geo-alt"></i> {{show.venue}}
+            </small>
+          </p>
+          <div class="mt-auto">
+            <p class="card-text mb-2"><span class="h5 text-danger">${{show.price}}</span></p>
+            <a [routerLink]="['/shows', show.id]" class="btn btn-primary w-100" (click)="checkLoginBeforeNavigate($event, '/shows/' + show.id)">
+              <i class="bi bi-ticket me-2"></i>Book Now
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Features Section -->
+<div class="container mb-5 py-5 bg-light rounded">
+  <div class="text-center mb-5">
+    <h2 class="section-title">Why Choose ShowVault?</h2>
+    <p class="lead text-muted">The ultimate platform for all your entertainment needs</p>
+  </div>
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card text-center h-100 shadow-sm hover-effect border-0">
+        <div class="card-body py-4">
+          <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mb-3">
+            <i class="bi bi-ticket-perforated"></i>
+          </div>
+          <h5 class="card-title text-primary">Easy Booking</h5>
+          <p class="card-text">Book your tickets in just a few clicks and get instant confirmation. No more waiting in lines!</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center h-100 shadow-sm hover-effect border-0">
+        <div class="card-body py-4">
+          <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mb-3">
+            <i class="bi bi-calendar-event"></i>
+          </div>
+          <h5 class="card-title text-primary">Wide Selection</h5>
+          <p class="card-text">Choose from a variety of movies, concerts, theater shows, and events from around the world.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center h-100 shadow-sm hover-effect border-0">
+        <div class="card-body py-4">
+          <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mb-3">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <h5 class="card-title text-primary">Secure Payments</h5>
+          <p class="card-text">Your payment information is always secure with our trusted payment system and encryption.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Login Required Modal -->
+<div class="modal fade" id="loginRequiredModal" tabindex="-1" aria-labelledby="loginRequiredModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginRequiredModalLabel">Login Required</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Please login to access this feature.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <a routerLink="/login" class="btn btn-primary">Login</a>
+      </div>
+    </div>
+  </div>
+</div>
