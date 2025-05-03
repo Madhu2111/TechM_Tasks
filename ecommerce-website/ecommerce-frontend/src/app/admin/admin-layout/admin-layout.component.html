@@ -1,0 +1,84 @@
+
+<div class="admin-layout">
+  <!-- Admin Header with Navigation -->
+  <header class="admin-header">
+    <div class="header-container">
+      <!-- Logo and Brand -->
+      <div class="logo">
+        <i class="bi bi-shield-lock me-2"></i>
+        <span>ADMIN PORTAL</span>
+      </div>
+
+      <!-- Main Navigation -->
+      <nav class="main-nav">
+        <ul class="nav-list">
+          <li class="nav-item" *ngFor="let item of navItems">
+            <a class="nav-link" [routerLink]="item.path" routerLinkActive="active">
+              <i class="bi" [ngClass]="item.icon"></i>
+              <span>{{ item.label }}</span>
+            </a>
+          </li>
+          
+          <!-- Reports Dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-graph-up"></i>
+              <span>Reports</span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
+              <li>
+                <a class="dropdown-item" routerLink="./dashboard" routerLinkActive="active">
+                  <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" routerLink="./reports/sales" routerLinkActive="active">
+                  <i class="bi bi-currency-dollar me-2"></i>Sales
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" routerLink="./reports/products" routerLinkActive="active">
+                  <i class="bi bi-bar-chart me-2"></i>Products
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" routerLink="./reports/users" routerLinkActive="active">
+                  <i class="bi bi-person-lines-fill me-2"></i>Users
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Right Side Actions -->
+      <div class="header-actions">
+        <div class="admin-badge">
+          <i class="bi bi-shield-lock me-1"></i> Admin Mode
+        </div>
+        <a href="/" class="btn btn-outline-light btn-sm">
+          <i class="bi bi-shop me-1"></i> View Store
+        </a>
+        <div class="dropdown">
+          <button class="btn btn-link dropdown-toggle" type="button" id="adminMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle me-1"></i>
+            <span>Admin</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminMenuDropdown">
+            <li><a class="dropdown-item" href="/profile"><i class="bi bi-person me-2"></i>Profile</a></li>
+            <li><a class="dropdown-item" href="/"><i class="bi bi-shop me-2"></i>View Store</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="javascript:void(0)" (click)="logout()"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="admin-content">
+    <div class="container-fluid">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

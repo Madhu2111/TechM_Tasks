@@ -1,0 +1,57 @@
+<div class="container mt-4">
+  <h2>My Orders</h2>
+  
+  <div *ngIf="isLoading" class="text-center my-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  
+  <div *ngIf="!isLoading && orders.length === 0" class="alert alert-info">
+    You don't have any orders yet.
+  </div>
+  
+  <div *ngIf="!isLoading && orders.length > 0" class="row">
+    <div class="col-12">
+      <div class="card mb-4" *ngFor="let order of orders">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="mb-0">Order #{{ order.id }}</h5>
+            <small class="text-muted">{{ order.createdAt | date:'medium' }}</small>
+          </div>
+          <div>
+            <span class="badge" [ngClass]="{
+              'bg-warning': order.status === 'PENDING',
+              'bg-info': order.status === 'PROCESSING',
+              'bg-primary': order.status === 'SHIPPED',
+              'bg-success': order.status === 'DELIVERED',
+              'bg-danger': order.status === 'CANCELLED'
+            }">{{ order.status }}</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-8">
+              <h6>Items:</h6>
+              <ul class="list-group mb-3">
+                <li *ngFor="let item of order.items" class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <span>{{ item.product.name }}</span>
+                    <small class="d-block text-muted">Qty: {{ item.quantity }}</small>
+                  </div>
+                  <span>{{ item.product.price * item.quantity | inrCurrency }}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-4">
+              <h6>Order Summary:</h6>
+              <p><strong>Total:</strong> {{ order.totalPrice | inrCurrency }}</p>
+              <p><strong>Payment Method:</strong> {{ order.paymentMethod }}</p>
+              <a [routerLink]="['/orders', order.id]" class="btn btn-primary">View Details</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

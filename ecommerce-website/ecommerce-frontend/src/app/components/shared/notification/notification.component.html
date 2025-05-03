@@ -1,0 +1,16 @@
+<div class="notification-container">
+  <div *ngFor="let notification of notifications" 
+       [@notificationAnimation]="'visible'"
+       class="notification" 
+       [ngClass]="'notification-' + notification.type">
+    <div class="notification-icon">
+      <i [ngClass]="getIconClass(notification.type)"></i>
+    </div>
+    <div class="notification-content">
+      {{ notification.message }}
+    </div>
+    <button class="notification-close" (click)="removeNotification(notification)">
+      <i class="bi bi-x"></i>
+    </button>
+  </div>
+</div>

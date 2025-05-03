@@ -1,0 +1,80 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+  <div class="container">
+    <!-- Brand -->
+    <a class="navbar-brand" routerLink="/">
+      <i class="bi bi-shop me-2"></i>E-Shop
+    </a>
+
+    <!-- Mobile Toggle Button -->
+    <button class="navbar-toggler" type="button" (click)="toggleMenu()">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navbar Links -->
+    <div class="collapse navbar-collapse" [ngClass]="{'show': !isMenuCollapsed}">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/products" routerLinkActive="active">Products</a>
+        </li>
+      </ul>
+
+      <!-- Right Side Links -->
+      <ul class="navbar-nav">
+        <!-- Cart (hidden for admin) -->
+        <li class="nav-item" *ngIf="!isAdmin()">
+          <a class="nav-link position-relative" routerLink="/cart">
+            <i class="bi bi-cart3"></i>
+            <ng-container *ngIf="cartItemCount$ | async as cartCount">
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" *ngIf="cartCount > 0">
+                {{ cartCount }}
+              </span>
+            </ng-container>
+          </a>
+        </li>
+
+        <!-- User Not Logged In -->
+        <ng-container *ngIf="!isLoggedIn()">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/login" routerLinkActive="active">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/register" routerLinkActive="active">Register</a>
+          </li>
+        </ng-container>
+
+        <!-- User Logged In -->
+        <li class="nav-item dropdown" *ngIf="isLoggedIn()">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle me-1"></i>
+            {{ currentUser?.username || 'Account' }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" routerLink="/profile">Profile</a></li>
+            
+            <!-- Regular user links -->
+            <ng-container *ngIf="!isAdmin()">
+              <li><a class="dropdown-item" routerLink="/orders">My Orders</a></li>
+            </ng-container>
+            
+            <!-- Admin links -->
+            <ng-container *ngIf="isAdmin()">
+              <li><a class="dropdown-item" routerLink="/admin">Admin Dashboard</a></li>
+              <li><a class="dropdown-item" routerLink="/admin/products">Manage Products</a></li>
+              <li><a class="dropdown-item" routerLink="/admin/orders">Manage Orders</a></li>
+              <li><a class="dropdown-item" routerLink="/admin/users">Manage Users</a></li>
+            </ng-container>
+            
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="javascript:void(0)" (click)="logout()">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Notification Component -->
+<app-notification></app-notification>

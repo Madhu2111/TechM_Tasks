@@ -1,0 +1,263 @@
+<!-- Hero Section with Carousel -->
+<section class="hero-section">
+  <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    </div>
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <div class="carousel-overlay"></div>
+        <div class="carousel-image" style="background-image: url('assets/images/hero-1.jpg');"></div>
+        <div class="carousel-caption">
+          <h1 class="animate__animated animate__fadeInDown">Welcome to ShopSmart</h1>
+          <p class="animate__animated animate__fadeInUp animate__delay-1s">Discover the latest trends and best deals</p>
+          <button class="btn btn-primary btn-lg animate__animated animate__fadeInUp animate__delay-2s" routerLink="/products">Shop Now</button>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="carousel-overlay"></div>
+        <div class="carousel-image" style="background-image: url('assets/images/hero-2.jpg');"></div>
+        <div class="carousel-caption">
+          <h1 class="animate__animated animate__fadeInDown">New Season Arrivals</h1>
+          <p class="animate__animated animate__fadeInUp animate__delay-1s">Check out our latest collection</p>
+          <button class="btn btn-primary btn-lg animate__animated animate__fadeInUp animate__delay-2s" routerLink="/products">Explore</button>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="carousel-overlay"></div>
+        <div class="carousel-image" style="background-image: url('assets/images/hero-3.jpg');"></div>
+        <div class="carousel-caption">
+          <h1 class="animate__animated animate__fadeInDown">Special Offers</h1>
+          <p class="animate__animated animate__fadeInUp animate__delay-1s">Limited time discounts on selected items</p>
+          <button class="btn btn-primary btn-lg animate__animated animate__fadeInUp animate__delay-2s" routerLink="/products">View Deals</button>
+        </div>
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-3">
+        <div class="feature-card" [@fadeInOut]>
+          <div class="feature-icon">
+            <i class="bi bi-truck"></i>
+          </div>
+          <h3>Free Shipping</h3>
+          <p>On orders over ₹4,150</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="feature-card" [@fadeInOut]="{ value: '', params: { delay: '300ms' } }">
+          <div class="feature-icon">
+            <i class="bi bi-arrow-repeat"></i>
+          </div>
+          <h3>Easy Returns</h3>
+          <p>30-day return policy</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="feature-card" [@fadeInOut]="{ value: '', params: { delay: '600ms' } }">
+          <div class="feature-icon">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <h3>Secure Payment</h3>
+          <p>100% secure checkout</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="feature-card" [@fadeInOut]="{ value: '', params: { delay: '900ms' } }">
+          <div class="feature-icon">
+            <i class="bi bi-headset"></i>
+          </div>
+          <h3>24/7 Support</h3>
+          <p>Dedicated support</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Categories Section -->
+<section class="categories-section py-5 bg-light">
+  <div class="container">
+    <div class="section-title text-center mb-5" [@fadeInOut]>
+      <h2>Shop by Category</h2>
+      <p>Browse our wide selection of products by category</p>
+    </div>
+    
+    <div class="row g-4">
+      <div *ngIf="loading" class="col-12 text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      
+      <ng-container *ngIf="!loading">
+        <div *ngFor="let category of categories; let i = index" class="col-md-3">
+          <div class="category-card" [@fadeInOut]="{ value: '', params: { delay: i * 200 + 'ms' } }" (click)="navigateToCategory(category)">
+            <div class="category-image-container">
+              <div class="category-image" [style.background-image]="'url(assets/images/category-' + (i + 1) + '.jpg)'"></div>
+              <div class="category-overlay">
+                <h3>{{ category }}</h3>
+                <button class="btn btn-outline-light">Shop Now</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Products Section -->
+<section class="featured-products-section py-5">
+  <div class="container">
+    <div class="section-title text-center mb-5" [@fadeInOut]>
+      <h2>Featured Products</h2>
+      <p>Handpicked products for you</p>
+    </div>
+    
+    <div class="row g-4">
+      <div *ngIf="loading" class="col-12 text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      
+      <ng-container *ngIf="!loading">
+        <div *ngFor="let product of featuredProducts; let i = index" class="col-md-3">
+          <div class="product-card" [@fadeInOut]="{ value: '', params: { delay: i * 200 + 'ms' } }">
+            <div class="product-badge" *ngIf="product.stockQuantity < 10">Limited Stock!</div>
+            <div class="product-image-container" (click)="navigateToProduct(product)">
+              <img [src]="product.imageUrl || 'assets/images/product-placeholder.jpg'" [alt]="product.name" class="product-image">
+              <div class="product-overlay">
+                <button class="btn btn-primary btn-sm">Quick View</button>
+              </div>
+            </div>
+            <div class="product-info">
+              <h3 class="product-title">{{ product.name }}</h3>
+              <p class="product-category">{{ product.category }}</p>
+              <div class="product-price">{{ product.price | inrCurrency }}</div>
+              <div class="product-actions">
+                <button class="btn btn-outline-primary btn-sm" (click)="addToCart(product)">
+                  <i class="bi bi-cart-plus"></i> Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+    
+    <div class="text-center mt-4">
+      <button class="btn btn-outline-primary btn-lg" routerLink="/products">View All Products</button>
+    </div>
+  </div>
+</section>
+
+<!-- New Arrivals Section -->
+<section class="new-arrivals-section py-5 bg-light">
+  <div class="container">
+    <div class="section-title text-center mb-5" [@fadeInOut]>
+      <h2>New Arrivals</h2>
+      <p>The latest additions to our store</p>
+    </div>
+    
+    <div class="row g-4">
+      <div *ngIf="loading" class="col-12 text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      
+      <ng-container *ngIf="!loading">
+        <div *ngFor="let product of newArrivals.slice(0, 4); let i = index" class="col-md-3">
+          <div class="product-card new-arrival" [@fadeInOut]="{ value: '', params: { delay: i * 200 + 'ms' } }">
+            <div class="product-badge new">New!</div>
+            <div class="product-image-container" (click)="navigateToProduct(product)">
+              <img [src]="product.imageUrl || 'assets/images/product-placeholder.jpg'" [alt]="product.name" class="product-image">
+              <div class="product-overlay">
+                <button class="btn btn-primary btn-sm">Quick View</button>
+              </div>
+            </div>
+            <div class="product-info">
+              <h3 class="product-title">{{ product.name }}</h3>
+              <p class="product-category">{{ product.category }}</p>
+              <div class="product-price">{{ product.price | inrCurrency }}</div>
+              <div class="product-actions">
+                <button class="btn btn-outline-primary btn-sm" (click)="addToCart(product)">
+                  <i class="bi bi-cart-plus"></i> Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+    
+    <div class="text-center mt-4">
+      <button class="btn btn-outline-primary btn-lg" routerLink="/products">View All New Arrivals</button>
+    </div>
+  </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="newsletter-section py-5">
+  <div class="container">
+    <div class="newsletter-container" [@fadeInOut]>
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <h2>Subscribe to Our Newsletter</h2>
+          <p>Get the latest updates, offers and special announcements delivered directly to your inbox.</p>
+        </div>
+        <div class="col-md-6">
+          <form [formGroup]="newsletterForm" (ngSubmit)="subscribeNewsletter()" class="newsletter-form">
+            <div class="input-group">
+              <input type="email" class="form-control" placeholder="Your email address" formControlName="email">
+              <button class="btn btn-primary" type="submit" [disabled]="newsletterForm.invalid || subscribing">
+                <span *ngIf="subscribing" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                Subscribe
+              </button>
+            </div>
+            <div *ngIf="newsletterForm.get('email')?.invalid && newsletterForm.get('email')?.touched" class="text-danger mt-2">
+              Please enter a valid email address
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<!-- Call to Action Section -->
+<section class="cta-section py-5">
+  <div class="container">
+    <div class="cta-container" [@fadeInOut]>
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h2>Ready to Start Shopping?</h2>
+          <p>Explore our wide range of products and find exactly what you're looking for.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+          <button class="btn btn-light btn-lg" routerLink="/products">Shop Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

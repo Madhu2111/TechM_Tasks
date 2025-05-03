@@ -1,0 +1,59 @@
+<div class="card product-card h-100" [@cardHover]="cardState" (mouseenter)="cardState = 'hover'" (mouseleave)="cardState = 'normal'">
+  <div class="product-image-container">
+    <div class="wishlist-icon" (click)="toggleWishlist($event)">
+      <i class="bi" [ngClass]="isInWishlist ? 'bi-heart-fill text-danger' : 'bi-heart'"></i>
+    </div>
+    <img [src]="product.imageUrl || 'assets/images/placeholder.jpg'" 
+         class="card-img-top product-image" 
+         [alt]="product.name"
+         (click)="viewDetails()">
+    <div *ngIf="product.stockQuantity <= 0" class="out-of-stock-badge">
+      Out of Stock
+    </div>
+    <div *ngIf="product.stockQuantity > 0 && product.stockQuantity < 10" class="limited-stock-badge">
+      Only {{product.stockQuantity}} left!
+    </div>
+  </div>
+  <div class="card-body d-flex flex-column">
+    <div class="product-rating mb-2">
+      <i class="bi bi-star-fill text-warning"></i>
+      <i class="bi bi-star-fill text-warning"></i>
+      <i class="bi bi-star-fill text-warning"></i>
+      <i class="bi bi-star-fill text-warning"></i>
+      <i class="bi bi-star-half text-warning"></i>
+      <small class="ms-1 text-muted">(4.5)</small>
+    </div>
+    <h5 class="card-title product-title" (click)="viewDetails()">{{ product.name }}</h5>
+    <p class="card-text product-category">
+      <span class="badge bg-light text-dark">{{ product.category || 'Uncategorized' }}</span>
+      <span *ngIf="product.brand" class="badge bg-light text-dark ms-1">{{ product.brand }}</span>
+    </p>
+    <p class="card-text product-description">{{ product.description ? (product.description | slice:0:80) + (product.description.length > 80 ? '...' : '') : 'No description available' }}</p>
+    <div class="mt-auto">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="product-price">{{ product.price | inrCurrency }}</span>
+        <span class="product-original-price text-decoration-line-through text-muted">{{ product.price | inrCurrency:true }}</span>
+      </div>
+      <div class="product-actions">
+        <button *ngIf="showAddToCart && product.stockQuantity > 0" 
+                class="btn btn-primary w-100 add-to-cart-btn" 
+                (click)="addToCart()">
+          <i class="bi bi-cart-plus"></i> Add to Cart
+        </button>
+        <button *ngIf="showAddToCart && product.stockQuantity <= 0" 
+                class="btn btn-secondary w-100" 
+                disabled>
+          <i class="bi bi-x-circle"></i> Out of Stock
+        </button>
+      </div>
+      <div *ngIf="isAdmin()" class="admin-actions mt-2 d-flex justify-content-between">
+        <a [routerLink]="['/admin/products/edit', product.id]" class="btn btn-outline-secondary btn-sm flex-grow-1 me-1">
+          <i class="bi bi-pencil"></i> Edit
+        </a>
+        <button class="btn btn-outline-danger btn-sm flex-grow-1">
+          <i class="bi bi-trash"></i> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

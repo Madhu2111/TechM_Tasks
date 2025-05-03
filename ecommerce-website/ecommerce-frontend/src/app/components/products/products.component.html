@@ -1,0 +1,135 @@
+<div class="products-hero-section mb-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center">
+        <h1 class="display-4 text-white mb-3">Discover Our Products</h1>
+        <p class="lead text-white mb-4">Find the perfect items for your needs with our extensive collection</p>
+        
+        <!-- Enhanced Search Bar -->
+        <div class="search-container">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">
+              <i class="bi bi-search"></i>
+            </span>
+            <input 
+              type="text" 
+              id="search" 
+              class="form-control border-start-0 shadow-none"
+              placeholder="Search for products..." 
+              [value]="searchQuery"
+              (input)="onSearch($event)"
+              autocomplete="off">
+            <button 
+              class="btn btn-light border border-start-0" 
+              type="button"
+              *ngIf="searchQuery"
+              (click)="searchQuery = ''; updateUrlParams()">
+              <i class="bi bi-x-lg"></i>
+            </button>
+            <button class="btn btn-primary" type="button">Search</button>
+          </div>
+          <div class="search-suggestions" *ngIf="searchQuery && searchQuery.length > 2">
+            <div class="suggestion-item" *ngFor="let suggestion of getFilteredSuggestions()" (click)="selectSuggestion(suggestion)">
+              <i class="bi bi-search me-2"></i> {{suggestion}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="row">
+    <!-- Filters Sidebar -->
+    <div class="col-lg-3 mb-4">
+      <div class="filters-card">
+        <div class="filters-header">
+          <h5 class="mb-0">Filters</h5>
+          <button class="btn btn-sm btn-outline-secondary" (click)="resetFilters()">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset
+          </button>
+        </div>
+        <div class="filters-body">
+
+          <!-- Categories -->
+          <div class="mb-4">
+            <label class="form-label">Categories</label>
+            <div class="list-group">
+              <button 
+                *ngFor="let category of categories" 
+                class="list-group-item list-group-item-action"
+                [class.active]="selectedCategory === category"
+                (click)="onCategoryChange(category)">
+                {{ category }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Sort Options -->
+          <div class="mb-4">
+            <label for="sortOptions" class="form-label">Sort By</label>
+            <select 
+              id="sortOptions" 
+              class="form-select"
+              (change)="onSortChange($event)">
+              <option value="id-asc" [selected]="sortBy === 'id' && sortDirection === 'asc'">Default</option>
+              <option value="price-asc" [selected]="sortBy === 'price' && sortDirection === 'asc'">Price: Low to High</option>
+              <option value="price-desc" [selected]="sortBy === 'price' && sortDirection === 'desc'">Price: High to Low</option>
+              <option value="name-asc" [selected]="sortBy === 'name' && sortDirection === 'asc'">Name: A to Z</option>
+              <option value="name-desc" [selected]="sortBy === 'name' && sortDirection === 'desc'">Name: Z to A</option>
+            </select>
+          </div>
+
+          <!-- Clear Filters -->
+          <button class="btn btn-outline-secondary w-100" (click)="clearFilters()">
+            Clear All Filters
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="col-lg-9">
+      <!-- Header with results count and sort options -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+          {{ selectedCategory ? selectedCategory : 'All Products' }}
+          <small *ngIf="totalItems > 0" class="text-muted">({{ totalItems }} items)</small>
+        </h2>
+      </div>
+
+      <!-- Loading Spinner -->
+      <app-loading-spinner *ngIf="loading" [message]="'Loading products...'"></app-loading-spinner>
+
+      <!-- No Results Message -->
+      <div *ngIf="!loading && filteredProducts.length === 0" class="alert alert-info">
+        No products found. Try adjusting your filters.
+      </div>
+
+      <!-- Products Grid -->
+      <div *ngIf="!loading && filteredProducts.length > 0" class="row">
+        <div *ngFor="let product of filteredProducts" class="col-md-4 col-sm-6 mb-4">
+          <app-product-card [product]="product"></app-product-card>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <nav *ngIf="totalPages > 1" aria-label="Product pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" [class.disabled]="currentPage === 0">
+            <a class="page-link" href="javascript:void(0)" (click)="onPageChange(currentPage - 1)">Previous</a>
+          </li>
+          <li *ngFor="let page of [].constructor(totalPages); let i = index" 
+              class="page-item" 
+              [class.active]="i === currentPage">
+            <a class="page-link" href="javascript:void(0)" (click)="onPageChange(i)">{{ i + 1 }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+            <a class="page-link" href="javascript:void(0)" (click)="onPageChange(currentPage + 1)">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,20 @@
+<ng-container *ngIf="!isAdminRoute; else adminContent">
+  <app-navbar></app-navbar>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="footer mt-auto py-3 bg-light">
+    <div class="container text-center">
+      <span class="text-muted">© 2023 E-Shop. All rights reserved.</span>
+    </div>
+  </footer>
+</ng-container>
+
+<ng-template #adminContent>
+  <router-outlet></router-outlet>
+</ng-template>
+
+<!-- Notification Component -->
+<app-notification></app-notification>

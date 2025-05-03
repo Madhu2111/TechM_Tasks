@@ -1,0 +1,59 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow">
+        <div class="card-body p-5">
+          <h2 class="text-center mb-4">Login</h2>
+          
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <!-- Username/Email Field -->
+            <div class="mb-3">
+              <label for="usernameOrEmail" class="form-label">Username or Email</label>
+              <input 
+                type="text" 
+                formControlName="usernameOrEmail" 
+                class="form-control" 
+                [ngClass]="{ 'is-invalid': submitted && f['usernameOrEmail'].errors }"
+                id="usernameOrEmail" 
+                placeholder="Enter username or email">
+              <div *ngIf="submitted && f['usernameOrEmail'].errors" class="invalid-feedback">
+                <div *ngIf="f['usernameOrEmail'].errors['required']">Username or Email is required</div>
+              </div>
+            </div>
+            
+            <!-- Password Field -->
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input 
+                type="password" 
+                formControlName="password" 
+                class="form-control" 
+                [ngClass]="{ 'is-invalid': submitted && f['password'].errors }"
+                id="password" 
+                placeholder="Enter password">
+              <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
+                <div *ngIf="f['password'].errors['required']">Password is required</div>
+                <div *ngIf="f['password'].errors['minlength']">Password must be at least 6 characters</div>
+              </div>
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="d-grid gap-2 mt-4">
+              <button 
+                type="submit" 
+                class="btn btn-primary" 
+                [disabled]="loading">
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                Login
+              </button>
+            </div>
+          </form>
+          
+          <div class="text-center mt-4">
+            <p>Don't have an account? <a routerLink="/register">Register</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

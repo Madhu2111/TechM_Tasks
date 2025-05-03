@@ -1,0 +1,174 @@
+<div class="admin-dashboard">
+  <h1>Admin Dashboard</h1>
+
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    {{ error }}
+  </div>
+
+  <div *ngIf="!isLoading && !error" class="dashboard-content">
+    <!-- Stats Cards -->
+    <div class="row stats-cards">
+      <div class="col-md-3 col-sm-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="bi bi-people me-2"></i>
+              Total Users
+            </h5>
+            <p class="card-text display-4">{{ dashboardStats.totalUsers }}</p>
+            <a routerLink="../users" class="btn btn-outline-primary">
+              <i class="bi bi-person-gear me-1"></i> Manage Users
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="bi bi-cart3 me-2"></i>
+              Total Orders
+            </h5>
+            <p class="card-text display-4">{{ dashboardStats.totalOrders }}</p>
+            <a routerLink="../orders" class="btn btn-outline-primary">
+              <i class="bi bi-list-check me-1"></i> Manage Orders
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="bi bi-box me-2"></i>
+              Total Products
+            </h5>
+            <p class="card-text display-4">{{ dashboardStats.totalProducts }}</p>
+            <a routerLink="../products" class="btn btn-outline-primary">
+              <i class="bi bi-grid me-1"></i> Manage Products
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="bi bi-currency-rupee me-2"></i>
+              Total Revenue
+            </h5>
+            <p class="card-text display-4">{{ dashboardStats.totalRevenue | inrCurrency }}</p>
+            <a routerLink="./reports/sales" class="btn btn-outline-primary">
+              <i class="bi bi-graph-up me-1"></i> View Reports
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Revenue Chart -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">
+          <i class="bi bi-bar-chart-line me-2"></i>
+          Monthly Revenue
+        </h5>
+        <div class="chart-container">
+          <!-- Chart would be rendered here using a chart library like Chart.js -->
+          <div *ngIf="monthlyRevenueLabels.length === 0" class="text-center">
+            <p class="text-muted mt-5">
+              <i class="bi bi-exclamation-circle me-2"></i>
+              No revenue data available
+            </p>
+          </div>
+          <div *ngIf="monthlyRevenueLabels.length > 0" class="chart-placeholder">
+            <div class="revenue-bars">
+              <div *ngFor="let value of monthlyRevenueData; let i = index" class="revenue-bar" 
+                   [style.height]="(value / getMaxRevenue()) * 80 + '%'">
+                <div class="revenue-value">{{ value | inrCurrency }}</div>
+              </div>
+            </div>
+            <div class="revenue-labels">
+              <div *ngFor="let label of monthlyRevenueLabels" class="revenue-label">{{ label }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">
+          <i class="bi bi-clock-history me-2"></i>
+          Recent Orders
+        </h5>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of dashboardStats.recentOrders">
+                <td><strong>#{{ order.id }}</strong></td>
+                <td>
+                  <i class="bi bi-person-circle me-1"></i>
+                  {{ order.user.username }}
+                </td>
+                <td>
+                  <i class="bi bi-calendar3 me-1"></i>
+                  {{ order.createdAt | date:'medium' }}
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="{
+                    'bg-warning': order.status === 'PENDING',
+                    'bg-info': order.status === 'PROCESSING',
+                    'bg-primary': order.status === 'SHIPPED',
+                    'bg-success': order.status === 'DELIVERED',
+                    'bg-danger': order.status === 'CANCELLED'
+                  }">
+                    <i class="bi" [ngClass]="{
+                      'bi-hourglass-split': order.status === 'PENDING',
+                      'bi-gear': order.status === 'PROCESSING',
+                      'bi-truck': order.status === 'SHIPPED',
+                      'bi-check-circle': order.status === 'DELIVERED',
+                      'bi-x-circle': order.status === 'CANCELLED'
+                    }"></i>
+                    {{ order.status }}
+                  </span>
+                </td>
+                <td>
+                  <strong>{{ order.totalPrice | inrCurrency }}</strong>
+                </td>
+              </tr>
+              <tr *ngIf="!dashboardStats.recentOrders || dashboardStats.recentOrders.length === 0">
+                <td colspan="5" class="text-center">
+                  <i class="bi bi-inbox me-2"></i>
+                  No recent orders
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="text-end mt-3">
+          <a routerLink="../orders" class="btn btn-primary">
+            <i class="bi bi-eye me-1"></i> View All Orders
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

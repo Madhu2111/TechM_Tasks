@@ -1,0 +1,196 @@
+<div class="admin-home">
+  <div class="welcome-section">
+    <h1>Welcome to Admin Portal</h1>
+    <p class="lead">Manage your e-commerce store with powerful tools and real-time analytics</p>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    {{ error }}
+    <div class="mt-3">
+      <button class="btn btn-outline-danger" (click)="retryLoading()">
+        <i class="bi bi-arrow-clockwise me-1"></i> Retry
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && !error" class="dashboard-content">
+    <!-- Quick Stats -->
+    <div class="row stats-cards">
+      <div class="col-md-3 col-sm-6">
+        <div class="card quick-stat-card">
+          <div class="card-body">
+            <div class="stat-icon">
+              <i class="bi bi-people"></i>
+            </div>
+            <h5 class="card-title">Total Users</h5>
+            <p class="card-text display-4">{{ dashboardStats.totalUsers || 0 }}</p>
+            <button class="btn btn-admin-primary" (click)="navigateTo('/admin/users')">
+              <i class="bi bi-person-gear me-1"></i> Manage Users
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="card quick-stat-card">
+          <div class="card-body">
+            <div class="stat-icon">
+              <i class="bi bi-cart3"></i>
+            </div>
+            <h5 class="card-title">Total Orders</h5>
+            <p class="card-text display-4">{{ dashboardStats.totalOrders || 0 }}</p>
+            <button class="btn btn-admin-primary" (click)="navigateTo('/admin/orders')">
+              <i class="bi bi-list-check me-1"></i> Manage Orders
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="card quick-stat-card">
+          <div class="card-body">
+            <div class="stat-icon">
+              <i class="bi bi-box"></i>
+            </div>
+            <h5 class="card-title">Total Products</h5>
+            <p class="card-text display-4">{{ dashboardStats.totalProducts || 0 }}</p>
+            <button class="btn btn-admin-primary" (click)="navigateTo('/admin/products')">
+              <i class="bi bi-grid me-1"></i> Manage Products
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="card quick-stat-card">
+          <div class="card-body">
+            <div class="stat-icon">
+              <i class="bi bi-currency-rupee"></i>
+            </div>
+            <h5 class="card-title">Total Revenue</h5>
+            <p class="card-text display-4">{{ dashboardStats.totalRevenue | inrCurrency }}</p>
+            <button class="btn btn-admin-primary" (click)="navigateTo('/admin/dashboard')">
+              <i class="bi bi-graph-up me-1"></i> View Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Quick Actions -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">
+          <i class="bi bi-lightning-charge me-2"></i>
+          Quick Actions
+        </h5>
+        <div class="row quick-actions">
+          <div class="col-md-3 col-sm-6">
+            <div class="quick-action-card" (click)="navigateTo('/admin/products/new')">
+              <div class="icon-container">
+                <i class="bi bi-plus-circle"></i>
+              </div>
+              <h6>Add New Product</h6>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="quick-action-card" (click)="navigateTo('/admin/orders')">
+              <div class="icon-container">
+                <i class="bi bi-truck"></i>
+              </div>
+              <h6>Process Orders</h6>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="quick-action-card" (click)="navigateTo('/admin/dashboard')">
+              <div class="icon-container">
+                <i class="bi bi-graph-up"></i>
+              </div>
+              <h6>View Analytics</h6>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6">
+            <div class="quick-action-card" (click)="navigateTo('/')">
+              <div class="icon-container">
+                <i class="bi bi-shop"></i>
+              </div>
+              <h6>View Store</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h5 class="card-title">
+          <i class="bi bi-clock-history me-2"></i>
+          Recent Orders
+        </h5>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of dashboardStats.recentOrders">
+                <td><strong>#{{ order.id }}</strong></td>
+                <td>
+                  <i class="bi bi-person-circle me-1"></i>
+                  {{ order.user?.username }}
+                </td>
+                <td>
+                  <i class="bi bi-calendar3 me-1"></i>
+                  {{ order.createdAt | date:'medium' }}
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="{
+                    'bg-warning': order.status === 'PENDING',
+                    'bg-info': order.status === 'PROCESSING',
+                    'bg-primary': order.status === 'SHIPPED',
+                    'bg-success': order.status === 'DELIVERED',
+                    'bg-danger': order.status === 'CANCELLED'
+                  }">
+                    <i class="bi" [ngClass]="{
+                      'bi-hourglass-split': order.status === 'PENDING',
+                      'bi-gear': order.status === 'PROCESSING',
+                      'bi-truck': order.status === 'SHIPPED',
+                      'bi-check-circle': order.status === 'DELIVERED',
+                      'bi-x-circle': order.status === 'CANCELLED'
+                    }"></i>
+                    {{ order.status }}
+                  </span>
+                </td>
+                <td>
+                  <strong>{{ order.totalPrice | inrCurrency }}</strong>
+                </td>
+              </tr>
+              <tr *ngIf="!dashboardStats.recentOrders || dashboardStats.recentOrders.length === 0">
+                <td colspan="5" class="text-center">
+                  <i class="bi bi-inbox me-2"></i>
+                  No recent orders
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="text-end mt-3">
+          <button class="btn btn-admin-primary" (click)="navigateTo('/admin/orders')">
+            <i class="bi bi-eye me-1"></i> View All Orders
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,116 @@
+<div class="container mt-4">
+  <div *ngIf="isLoading" class="text-center my-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  
+  <div *ngIf="!isLoading && order">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Order #{{ order.id }}</h2>
+      <div>
+        <span class="badge me-2" [ngClass]="{
+          'bg-warning': order.status === 'PENDING',
+          'bg-info': order.status === 'PROCESSING',
+          'bg-primary': order.status === 'SHIPPED',
+          'bg-success': order.status === 'DELIVERED',
+          'bg-danger': order.status === 'CANCELLED'
+        }">{{ order.status }}</span>
+        <a routerLink="/orders" class="btn btn-outline-secondary">Back to Orders</a>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Order Items</h5>
+          </div>
+          <div class="card-body">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Price</th>
+                  <th>Quantity</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of order.items">
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <img *ngIf="item.product.imageUrl" [src]="item.product.imageUrl" alt="{{ item.product.name }}" class="me-2" style="width: 50px; height: 50px; object-fit: cover;">
+                      <div>
+                        <div>{{ item.product.name }}</div>
+                        <small class="text-muted">{{ item.product.brand }}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ item.product.price | inrCurrency }}</td>
+                  <td>{{ item.quantity }}</td>
+                  <td>{{ item.product.price * item.quantity | inrCurrency }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                  <td>{{ order.totalPrice | inrCurrency }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Order Summary</h5>
+          </div>
+          <div class="card-body">
+            <p><strong>Order Date:</strong> {{ order.createdAt | date:'medium' }}</p>
+            <p><strong>Payment Method:</strong> {{ order.paymentMethod }}</p>
+            <p><strong>Total Amount:</strong> {{ order.totalPrice | inrCurrency }}</p>
+            
+            <div *ngIf="isAdmin" class="mt-3">
+              <h6>Update Order Status</h6>
+              <div class="input-group mb-3">
+                <select class="form-select" [(ngModel)]="selectedStatus">
+                  <option *ngFor="let status of availableStatuses" [value]="status">{{ status }}</option>
+                </select>
+                <button class="btn btn-primary" (click)="updateOrderStatus()" [disabled]="selectedStatus === order.status">Update</button>
+              </div>
+            </div>
+            
+            <div *ngIf="!isAdmin && canCancelOrder()" class="mt-3">
+              <button class="btn btn-danger w-100" (click)="cancelOrder()">Cancel Order</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Shipping Address</h5>
+          </div>
+          <div class="card-body">
+            <p class="mb-0">{{ order.shippingAddress.street }}</p>
+            <p class="mb-0">{{ order.shippingAddress.city }}, {{ order.shippingAddress.state }} {{ order.shippingAddress.zipCode }}</p>
+            <p>{{ order.shippingAddress.country }}</p>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <h5>Billing Address</h5>
+          </div>
+          <div class="card-body">
+            <p class="mb-0">{{ order.billingAddress.street }}</p>
+            <p class="mb-0">{{ order.billingAddress.city }}, {{ order.billingAddress.state }} {{ order.billingAddress.zipCode }}</p>
+            <p>{{ order.billingAddress.country }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
